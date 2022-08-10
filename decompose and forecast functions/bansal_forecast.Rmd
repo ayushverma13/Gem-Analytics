@@ -1,0 +1,107 @@
+---
+title: "BANSAL_WIRE_Forecast"
+output: html_document
+---
+
+``` {r echo =FALSE, results = 'asis', message=FALSE, warning=FALSE, results='show'}
+
+library(fpp2)
+library(dplyr)
+library(tidyr)
+library(xts)
+library(tidyverse)
+library(knitr)
+library(dygraphs)
+library(tidyverse)
+library(dplyr)
+library(data.table)
+library(stringr)
+library(plotly)
+library(Hmisc)
+master1<-read_csv("~/Documents/personal/Courses/R workingdirectory/Gem data/invoice_2015-AMJ.csv")
+master2<-read_csv("~/Documents/personal/Courses/R workingdirectory/Gem data/invoice_2015-JAS.csv")
+master3<-read_csv("~/Documents/personal/Courses/R workingdirectory/Gem data/invoice_2015-OND.csv")
+
+master4 <- read_csv("~/Documents/personal/Courses/R workingdirectory/Gem data/invoice_2016_JFM.csv")
+master5 <- read_csv("~/Documents/personal/Courses/R workingdirectory/Gem data/invoice_2016_AMJ.csv")
+master6 <- read_csv("~/Documents/personal/Courses/R workingdirectory/Gem data/invoice_2016_JAS.csv")
+master7 <- read_csv("~/Documents/personal/Courses/R workingdirectory/Gem data/invoice_2016_OND.csv")
+
+master8 <- read_csv("~/Documents/personal/Courses/R workingdirectory/Gem data/invoice_2017-JFM.csv")
+master9 <- read_csv("~/Documents/personal/Courses/R workingdirectory/Gem data/invoice_2017-APR_MAY_JUN.csv")
+master10 <- read_csv("~/Documents/personal/Courses/R workingdirectory/Gem data/invoice_2017-jul-aug.csv")
+master11 <- read_csv("~/Documents/personal/Courses/R workingdirectory/Gem data/invoice_2017-sept.csv")
+master12 <- read_csv("~/Documents/personal/Courses/R workingdirectory/Gem data/invoice_2018-OND.csv")
+master13<- read_csv("~/Documents/personal/Courses/R workingdirectory/Gem data/invoice_2018-JFM.csv")
+master14 <- read_csv("~/Documents/personal/Courses/R workingdirectory/Gem data/invoice_20180713 (7).csv")
+master15 <- read_csv("~/Documents/personal/Courses/R workingdirectory/Gem data/invoice_2018-may.csv")
+master16 <- read_csv("~/Documents/personal/Courses/R workingdirectory/Gem data/invoice_2018-jun.csv")
+
+
+master <- rbind(master1, master2, master3, master4, master5, master6,master7,master8,master9,master10,master11,master12,master13,master14,master15,master16)
+setnames(master, old = c("voucher date", "account name", "voucher no", "product name", "quantity", "rate", "amount"), new=c("Date", "Party", "Vch No.", "item", "Order Qty", "Price", "Amt."))
+master$Amt.<-(-1)*(master$Amt.)
+
+
+# TO CONVERT TO CAPS  
+# master<-mutate_all(master,funs(toupper))
+
+map<-read.csv("~/Documents/personal/Courses/R workingdirectory/gem_product_code_mapping(1).csv")
+
+map_customer<-read.csv("~/Documents/personal/Courses/R workingdirectory/gem_customer_mapping.csv")
+map_customer<-map_customer%>%select(Party,Territory,Industry.Type)
+
+master <- master%>%rowwise()%>%
+  mutate( Territory = ifelse(is.element(toString(Party), map_customer$Party),
+toString(map_customer[match(toString(Party), map_customer$Party), 2]), "Uncategorized"))
+
+master <- master%>%rowwise()%>%
+  mutate( Industry.Type = ifelse(is.element(toString(Party), map_customer$Party),
+toString(map_customer[match(toString(Party), map_customer$Party), 3]), "Uncategorized"))
+
+
+map <- map%>%select(item_code, product_group, item_group )
+
+master <- master%>%rowwise()%>%
+  mutate( product_group = ifelse(is.element(toString(item), map$item_code),
+toString(map[match(toString(item), map$item_code), 2]), "Uncategorized"))
+
+master <- master%>%rowwise()%>%
+  mutate( item_group = ifelse(is.element(toString(item), map$item_code),
+toString(map[match(toString(item), map$item_code), 3]), "Uncategorized"))
+
+master<-master%>%filter(`voucher type`%in%c("Excise Invoice","Sale GST"))
+
+master$Date = as.Date(master$Date,"%d-%m-%Y")
+
+master_ltr<-master%>%mutate(`Order Qty`=ifelse(grepl("LTR",`Order Qty`),`Order Qty`,"0 LTRS"))%>%rowwise()%>%filter(`Order Qty` != "0 LTRS")
+master_ltr$`Order Qty`<-str_replace_all(master_ltr$`Order Qty`,fixed(" LTRS"),"")%>%as.numeric()
+
+master_kg<-master%>%mutate(`Order Qty`=ifelse(grepl("KG",`Order Qty`),`Order Qty`,"0 KGS"))%>%rowwise()%>%filter(`Order Qty` != "0 KGS")
+master_kg$`Order Qty`<-str_replace_all(master_kg$`Order Qty`,fixed(" KGS"),"")%>%as.numeric()
+
+```
+
+
+
+# SALES BY VALUE
+
+``` {r echo =FALSE, results = 'asis', warning=FALSE, results='show'}
+source("~/Documents/personal/Courses/forecast_customers.R")
+
+a <- forecast_customers(master, 1,1,1)
+a$temp2
+kable(a$temp1)
+```
+
+
+# SALES BY VOLUME (LTRS)
+``` {r echo =FALSE, results = 'asis',warning=FALSE,results='show'}
+source("~/Documents/personal/Courses/forecast_customers.R")
+
+a<-forecast_customers(master_ltr,2,2,1)
+a$temp2
+kable(a$temp1)
+```
+
+

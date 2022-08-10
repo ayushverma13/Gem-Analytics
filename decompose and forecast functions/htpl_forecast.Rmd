@@ -1,0 +1,88 @@
+---
+title: "HTPL Forecast"
+output: html_document
+---
+
+---
+title: "HTPL Forecast"
+output: html_document
+---
+
+``` {r echo =FALSE, results = 'asis', message=FALSE, warning=FALSE, results='show'}
+
+library(fpp2)
+library(dplyr)
+library(tidyr)
+library(xts)
+library(tidyverse)
+library(knitr)
+library(dygraphs)
+library(tidyverse)
+library(dplyr)
+library(data.table)
+library(stringr)
+library(plotly)
+library(Hmisc)
+
+htpldata<-read.csv("~/Documents/personal/Courses/R workingdirectory/HTPL/holding_tally_daybook (7).csv")
+htpldata<-htpldata%>%select(vchType,vchDate,accountName,total)%>%filter(vchType=="Sales")
+
+setnames(htpldata, old = c("vchDate", "accountName", "total"), new=c("Date", "Party", "Amt."))
+htpldata$Amt.<-as.numeric(htpldata$Amt.)
+htpldata$Date<-as.Date(htpldata$Date,"%Y-%m-%d")
+htpldata$Party<-as.character(htpldata$Party)
+# TO CONVERT TO CAPS  
+# master<-mutate_all(master,funs(toupper))
+```
+
+
+# SALES BY VALUE (Monthly)
+
+``` {r echo =FALSE, results = 'asis', warning=FALSE, results='show'}
+source("~/Documents/personal/Courses/forecast_totalsales.R")
+a <- forecast_totalsales(htpldata, 1,1)
+a$temp2
+kable(a$temp1)
+
+```
+
+
+
+
+# SALES BY VALUE (Quarterly)
+
+``` {r echo =FALSE, results = 'asis', warning=FALSE, results='show'}
+
+a <- forecast_totalsales(htpldata, 1,2)
+a$temp2
+kable(a$temp1)
+```
+
+
+
+# SALES BY VALUE TOP CUSTOMERS (Monthly)
+
+``` {r echo =FALSE, results = 'asis', warning=FALSE, results='show'}
+source("~/Documents/personal/Courses/forecast_customers.R")
+
+
+a <- forecast_customers(htpldata, 1,1,1)
+a$temp2
+kable(a$temp1)
+
+a <- forecast_customers(htpldata, 1,2,1)
+a$temp2
+kable(a$temp1)
+
+a <- forecast_customers(htpldata, 1,3,1)
+a$temp2
+kable(a$temp1)
+
+a <- forecast_customers(htpldata, 1,4,1)
+a$temp2
+kable(a$temp1)
+
+a <- forecast_customers(htpldata, 1,5,1)
+a$temp2
+kable(a$temp1)
+```

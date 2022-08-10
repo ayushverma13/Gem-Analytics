@@ -1,0 +1,431 @@
+---
+title: "Usha Martin HSPR Top Products(Value) - Decomposition and Forecasts"
+output: html_document
+---
+
+``` {r echo =FALSE, results = 'asis', message=FALSE, warning=FALSE, results='show'}
+
+library(fpp2)
+library(dplyr)
+library(tidyr)
+library(xts)
+library(tidyverse)
+library(knitr)
+library(dygraphs)
+library(tidyverse)
+library(dplyr)
+library(data.table)
+library(stringr)
+library(plotly)
+library(Hmisc)
+library(testit)
+
+
+
+
+
+um13<-read_csv("~/Desktop/USHA MARTIN/Wire_Load_17/Jan-17-Table 1.csv")%>%as.data.frame()%>%head(-1)%>%select(PRODUCT,Size,`Hspr-Load`,Fasttraders,`Rate(Rs)`,UP,`Rate(Rs)_1`,Jpr,`Rate(Rs)_2`,Hspr,`Rate(Rs)_3`,Date)
+um14<-read_csv("~/Desktop/USHA MARTIN/Wire_Load_17/Feb-17-Table 1.csv")%>%as.data.frame()%>%head(-1)%>%select(PRODUCT,Size,`Hspr-Load`,Fasttraders,`Rate(Rs)`,UP,`Rate(Rs)_1`,Jpr,`Rate(Rs)_2`,Hspr,`Rate(Rs)_3`,Date)
+um15<-read_csv("~/Desktop/USHA MARTIN/Wire_Load_17/Mar-17-Table 1.csv")%>%as.data.frame()%>%head(-1)%>%select(PRODUCT,Size,`Hspr-Load`,Fasttraders,`Rate(Rs)`,UP,`Rate(Rs)_1`,Jpr,`Rate(Rs)_2`,Hspr,`Rate(Rs)_3`,Date)
+um16<- read_csv("~/Desktop/USHA MARTIN/Wire_Load_17/Apr-17-Table 1.csv")%>%as.data.frame()%>%head(-1)%>%select(PRODUCT,Size,`Hspr-Load`,Fasttraders,`Rate(Rs)`,UP,`Rate(Rs)_1`,Jpr,`Rate(Rs)_2`,Hspr,`Rate(Rs)_3`,Date)
+um17<- read_csv("~/Desktop/USHA MARTIN/Wire_Load_17/May-17-Table 1.csv")%>%as.data.frame()%>%head(-1)%>%select(PRODUCT,Size,`Hspr-Load`,Fasttraders,`Rate(Rs)`,UP,`Rate(Rs)_1`,Jpr,`Rate(Rs)_2`,Hspr,`Rate(Rs)_3`,Date)
+um18<- read_csv("~/Desktop/USHA MARTIN/Wire_Load_17/Jun-17-Table 1.csv")%>%as.data.frame()%>%head(-1)%>%select(PRODUCT,Size,`Hspr-Load`,Fasttraders,`Rate(Rs)`,UP,`Rate(Rs)_1`,Jpr,`Rate(Rs)_2`,Hspr,`Rate(Rs)_3`,Date)
+um19<- read_csv("~/Desktop/USHA MARTIN/Wire_Load_17/Jul-17-Table 1.csv")%>%as.data.frame()%>%head(-1)%>%select(PRODUCT,Size,`Hspr-Load`,Fasttraders,`Rate(Rs)`,UP,`Rate(Rs)_1`,Jpr,`Rate(Rs)_2`,Hspr,`Rate(Rs)_3`,Date)
+um20<- read_csv("~/Desktop/USHA MARTIN/Wire_Load_17/Aug-17-Table 1.csv")%>%as.data.frame()%>%head(-1)%>%select(PRODUCT,Size,`Hspr-Load`,Fasttraders,`Rate(Rs)`,UP,`Rate(Rs)_1`,Jpr,`Rate(Rs)_2`,Hspr,`Rate(Rs)_3`,Date)
+um21<- read_csv("~/Desktop/USHA MARTIN/Wire_Load_17/Sep-17-Table 1.csv")%>%as.data.frame()%>%head(-1)%>%select(PRODUCT,Size,`Hspr-Load`,Fasttraders,`Rate(Rs)`,UP,`Rate(Rs)_1`,Jpr,`Rate(Rs)_2`,Hspr,`Rate(Rs)_3`,Date)
+um22<- read_csv("~/Desktop/USHA MARTIN/Wire_Load_17/Oct-17-Table 1.csv")%>%as.data.frame()%>%head(-1)%>%select(PRODUCT,Size,`Hspr-Load`,Fasttraders,`Rate(Rs)`,UP,`Rate(Rs)_1`,Jpr,`Rate(Rs)_2`,Hspr,`Rate(Rs)_3`,Date)
+um23 <- read_csv("~/Desktop/USHA MARTIN/Wire_Load_17/Nov-17-Table 1.csv")%>%as.data.frame()%>%head(-1)%>%select(PRODUCT,Size,`Hspr-Load`,Fasttraders,`Rate(Rs)`,UP,`Rate(Rs)_1`,Jpr,`Rate(Rs)_2`,Hspr,`Rate(Rs)_3`,Date)
+um24<- read_csv("~/Desktop/USHA MARTIN/Wire_Load_17/Dec-17-Table 1.csv")%>%as.data.frame()%>%head(-1)%>%select(PRODUCT,Size,`Hspr-Load`,Fasttraders,`Rate(Rs)`,UP,`Rate(Rs)_1`,Jpr,`Rate(Rs)_2`,Hspr,`Rate(Rs)_3`,Date)
+
+
+
+
+
+
+um1<-read_csv("~/Desktop/USHA MARTIN/2018 UM Sales/Load Jan-18 .csv")%>%as.data.frame()%>%head(-1)%>%
+  select(PRODUCT,Size,`Hspr-Load`,Fasttraders,`Rate(Rs)`,UP,`Rate(Rs)_1`,Jpr,`Rate(Rs)_2`,Hspr,`Rate(Rs)_3`,Date)
+um2<-read_csv("~/Desktop/USHA MARTIN/2018 UM Sales/Load FEB--18 .csv")%>%as.data.frame()%>%head(-1)%>%
+  select(PRODUCT,Size,`Hspr-Load`,Fasttraders,`Rate(Rs)`,UP,`Rate(Rs)_1`,Jpr,`Rate(Rs)_2`,Hspr,`Rate(Rs)_3`,Date)
+um3<-read_csv("~/Desktop/USHA MARTIN/2018 UM Sales/Load March--18 .csv")%>%as.data.frame()%>% head(-1)%>%
+  select(PRODUCT,Size,`Hspr-Load`,Fasttraders,`Rate(Rs)`,UP,`Rate(Rs)_1`,Jpr,`Rate(Rs)_2`,Hspr,`Rate(Rs)_3`,Date)
+um4 <- read_csv("~/Desktop/USHA MARTIN/2018 UM Sales/Load April-18 .csv")%>%as.data.frame()%>%head(-1)%>%select(PRODUCT,Size,`Hspr-Load`,Fasttraders,`Rate(Rs)`,UP,`Rate(Rs)_1`,Jpr,`Rate(Rs)_2`,Hspr,`Rate(Rs)_3`,Date)
+um5 <- read_csv("~/Desktop/USHA MARTIN/2018 UM Sales/Copy of Load May-18 .csv")%>%as.data.frame()%>%head(-1)%>%
+  select(PRODUCT,Size,`Hspr-Load`,Fasttraders,`Rate(Rs)`,UP,`Rate(Rs)_1`,Jpr,`Rate(Rs)_2`,Hspr,`Rate(Rs)_3`,Date)
+um6 <- read_csv("~/Desktop/USHA MARTIN/2018 UM Sales/Copy of Copy of Load june-18.csv")%>%as.data.frame()%>%head(-1)%>%
+  select(PRODUCT,Size,`Hspr-Load`,Fasttraders,`Rate(Rs)`,UP,`Rate(Rs)_1`,Jpr,`Rate(Rs)_2`,Hspr,`Rate(Rs)_3`,Date)
+um7 <- read_csv("~/Desktop/USHA MARTIN/2018 UM Sales/Load july-18 .csv")%>%as.data.frame()%>%head(-1)%>%
+  select(PRODUCT,Size,`Hspr-Load`,Fasttraders,`Rate(Rs)`,UP,`Rate(Rs)_1`,Jpr,`Rate(Rs)_2`,Hspr,`Rate(Rs)_3`,Date)
+um8 <- read_csv("~/Desktop/USHA MARTIN/2018 UM Sales/Load August-18.csv")%>%as.data.frame()%>%head(-1)%>%
+  select(PRODUCT,Size,`Hspr-Load`,Fasttraders,`Rate(Rs)`,UP,`Rate(Rs)_1`,Jpr,`Rate(Rs)_2`,Hspr,`Rate(Rs)_3`,Date)
+um9 <- read_csv("~/Desktop/USHA MARTIN/2018 UM Sales/Load Sept-18.csv")%>%as.data.frame()%>%head(-1)%>%
+  select(PRODUCT,Size,`Hspr-Load`,Fasttraders,`Rate(Rs)`,UP,`Rate(Rs)_1`,Jpr,`Rate(Rs)_2`,Hspr,`Rate(Rs)_3`,Date)
+um10 <- read_csv("~/Desktop/USHA MARTIN/2018 UM Sales/Load Oct-18.csv")%>%as.data.frame()%>%head(-1)%>%
+  select(PRODUCT,Size,`Hspr-Load`,Fasttraders,`Rate(Rs)`,UP,`Rate(Rs)_1`,Jpr,`Rate(Rs)_2`,Hspr,`Rate(Rs)_3`,Date)
+um11 <- read_csv("~/Desktop/USHA MARTIN/2018 UM Sales/Load Nov-18.csv")%>%as.data.frame()%>%head(-1)%>%
+  select(PRODUCT,Size,`Hspr-Load`,Fasttraders,`Rate(Rs)`,UP,`Rate(Rs)_1`,Jpr,`Rate(Rs)_2`,Hspr,`Rate(Rs)_3`,Date)
+um12 <- read_csv("~/Desktop/USHA MARTIN/2018 UM Sales/Load Dec-18.csv")%>%as.data.frame()%>%head(-1)%>%
+  select(PRODUCT,Size,`Hspr-Load`,Fasttraders,`Rate(Rs)`,UP,`Rate(Rs)_1`,Jpr,`Rate(Rs)_2`,Hspr,`Rate(Rs)_3`,Date)
+
+
+
+
+
+
+# umar <- rbind(um1, um2, um3, um4, um5, um6,um7,um8,um9,um10,um11,um12) 
+umar <- rbind(um1, um2, um3, um4, um5,um6,um7,um8,um9,um10,um11,um12,um13,um14,um15,um16,um17,um18,um19,um20,um21,um22,um23,um24)
+
+setnames(umar, old = c("Rate(Rs)", "Rate(Rs)_1", "Rate(Rs)_2", "Rate(Rs)_3","Hspr-Load","Fasttraders","UP","Jpr","Hspr","PRODUCT"), new=c("Rate(Rs)_fasttraders", "Rate(Rs)_UP", "Rate(Rs)_Jaipur", "Rate(Rs)_Hspr","Total load","Load_Fasttraders","Load_UP","Load_Jaipur","Load_HSPR","product_group"))
+
+umar[is.na(umar)]<-0
+umar$Date<-as.Date(umar$Date,format = "%d/%m/%Y")
+umar$Date_monthly<-format(as.Date(umar$Date), "%b-%Y")
+
+
+
+umar_fasttraders<-umar%>%mutate(Territory="NCR",Load=umar$Load_Fasttraders,Rate=umar$`Rate(Rs)_fasttraders`)%>%select(product_group,Size,Load,Rate,Date,Date_monthly,Territory)%>%arrange(Date)
+umar_fasttraders$Load<-umar_fasttraders$Load%>%as.numeric()
+umar_fasttraders$Size<-umar_fasttraders$Size%>%as.numeric()  
+umar_fasttraders$Rate<-umar_fasttraders$Rate%>%as.numeric()
+umar_fasttraders<-umar_fasttraders%>%mutate(Amt.=Load*Rate)
+setnames(umar_fasttraders,old = c("Load"),new = c("Order Qty"))
+
+
+umar_UP<-umar%>%mutate(Territory="UP",Load=umar$Load_UP,Rate=umar$`Rate(Rs)_UP`)%>%select(product_group,Size,Load,Rate,Date,Date_monthly,Territory)%>%arrange(Date)
+umar_UP$Load<-umar_UP$Load%>%as.numeric()
+umar_UP$Size<-umar_UP$Size%>%as.numeric()  
+umar_UP$Rate<-umar_UP$Rate%>%as.numeric()
+umar_UP<-umar_UP%>%mutate(Amt.=Load*Rate)
+setnames(umar_UP,old = c("Load"),new = c("Order Qty"))
+
+
+
+
+umar_Jaipur<-umar%>%mutate(Territory="JAIPUR",Load=umar$Load_Jaipur,Rate=umar$`Rate(Rs)_Jaipur`)%>%select(product_group,Size,Load,Rate,Date,Date_monthly,Territory)%>%arrange(Date)
+umar_Jaipur$Load<-umar_Jaipur$Load%>%as.numeric()
+umar_Jaipur$Size<-umar_Jaipur$Size%>%as.numeric()  
+umar_Jaipur$Rate<-umar_Jaipur$Rate%>%as.numeric()
+umar_Jaipur<-umar_Jaipur%>%mutate(Amt.=Load*Rate)
+setnames(umar_Jaipur,old = c("Load"),new = c("Order Qty"))
+
+
+
+umar_HSPR<-umar%>%mutate(Territory="HSPR",Load=umar$Load_HSPR,Rate=umar$`Rate(Rs)_Hspr`)%>%select(product_group,Size,Load,Rate,Date,Date_monthly,Territory)%>%arrange(Date)
+umar_HSPR$Load<-umar_HSPR$Load%>%as.numeric()
+umar_HSPR$Size<-umar_HSPR$Size%>%as.numeric()  
+umar_HSPR$Rate<-umar_HSPR$Rate%>%as.numeric()
+umar_HSPR<-umar_HSPR%>%mutate(Amt.=Load*Rate)
+setnames(umar_HSPR,old = c("Load"),new = c("Order Qty"))
+
+
+
+umar_total_territory<-rbind(umar_HSPR,umar_Jaipur,umar_UP,umar_fasttraders)%>%arrange(Date)
+
+
+
+
+
+
+
+
+
+```
+
+# Decomposition and Forecasts of Top product sales by value
+
+# Spring Wire Grade-I
+``` {r echo =FALSE, results = 'asis', warning=FALSE, results='show'}
+source("~/Desktop/decompose and forecast functions/decompose_products.R")
+a<-decompose_products(umar_total_territory,5,1)
+a[[1]]
+a[[2]]
+a[[3]]
+
+```
+
+#Monthly
+``` {r echo =FALSE, results = 'asis', warning=FALSE, results='show'}
+source("~/Desktop/decompose and forecast functions/forecast_products.R")
+a<-forecast_product(umar_total_territory,1,5,1)
+a[[2]]
+kable(a[[1]])
+
+```
+
+#Quarterly
+``` {r echo =FALSE, results = 'asis', warning=FALSE, results='show'}
+
+a<-forecast_product(umar_total_territory,1,5,2)
+a[[2]]
+kable(a[[1]])
+```
+
+
+
+
+
+# Spring Wire Grade-II
+``` {r echo =FALSE, results = 'asis', warning=FALSE, results='show'}
+a<-decompose_products(umar_total_territory,2,1)
+a[[1]]
+a[[2]]
+a[[3]]
+
+```
+
+#Monthly
+``` {r echo =FALSE, results = 'asis', warning=FALSE, results='show'}
+a<-forecast_product(umar_total_territory,1,2,1)
+a[[2]]
+kable(a[[1]])
+
+```
+
+#Quarterly
+``` {r echo =FALSE, results = 'asis', warning=FALSE, results='show'}
+
+a<-forecast_product(umar_total_territory,1,2,2)
+a[[2]]
+kable(a[[1]])
+```
+
+
+
+# Spring Wire Grade-II(BORAX)
+
+``` {r echo =FALSE, results = 'asis', warning=FALSE, results='show'}
+a<-decompose_products(umar_total_territory,28,1)
+a[[1]]
+a[[2]]
+a[[3]]
+
+```
+
+#Monthly
+``` {r echo =FALSE, results = 'asis', warning=FALSE, results='show'}
+a<-forecast_product(umar_total_territory,1,28,1)
+a[[2]]
+kable(a[[1]])
+
+```
+
+#Quarterly
+``` {r echo =FALSE, results = 'asis', warning=FALSE, results='show'}
+
+a<-forecast_product(umar_total_territory,1,28,2)
+a[[2]]
+kable(a[[1]])
+```
+
+
+# Spring Wire Grade-III
+``` {r echo =FALSE, results = 'asis', warning=FALSE, results='show'}
+a<-decompose_products(umar_total_territory,6,1)
+a[[1]]
+a[[2]]
+a[[3]]
+
+```
+
+#Monthly
+``` {r echo =FALSE, results = 'asis', warning=FALSE, results='show'}
+a<-forecast_product(umar_total_territory,1,6,1)
+a[[2]]
+kable(a[[1]])
+
+```
+
+#Quarterly
+``` {r echo =FALSE, results = 'asis', warning=FALSE, results='show'}
+
+a<-forecast_product(umar_total_territory,1,6,2)
+a[[2]]
+kable(a[[1]])
+```
+
+
+# Spring Wire FQ
+``` {r echo =FALSE, results = 'asis', warning=FALSE, results='show'}
+a<-decompose_products(umar_total_territory,4,1)
+a[[1]]
+a[[2]]
+a[[3]]
+
+```
+
+#Monthly
+``` {r echo =FALSE, results = 'asis', warning=FALSE, results='show'}
+a<-forecast_product(umar_total_territory,1,4,1)
+a[[2]]
+kable(a[[1]])
+
+```
+
+#Quarterly
+``` {r echo =FALSE, results = 'asis', warning=FALSE, results='show'}
+
+a<-forecast_product(umar_total_territory,1,4,2)
+a[[2]]
+kable(a[[1]])
+```
+
+# PC Wire 
+
+``` {r echo =FALSE, results = 'asis', warning=FALSE, results='show'}
+a<-decompose_products(umar_total_territory,1,1)
+a[[1]]
+a[[2]]
+a[[3]]
+
+```
+
+#Monthly
+``` {r echo =FALSE, results = 'asis', warning=FALSE, results='show'}
+a<-forecast_product(umar_total_territory,1,1,1)
+a[[2]]
+kable(a[[1]])
+
+```
+
+#Quarterly
+``` {r echo =FALSE, results = 'asis', warning=FALSE, results='show'}
+
+a<-forecast_product(umar_total_territory,1,1,2)
+a[[2]]
+kable(a[[1]])
+```
+
+
+# CC Wire 
+
+``` {r echo =FALSE, results = 'asis', warning=FALSE, results='show'}
+a<-decompose_products(umar_total_territory,3,1)
+a[[1]]
+a[[2]]
+a[[3]]
+
+```
+
+#Monthly
+``` {r echo =FALSE, results = 'asis', warning=FALSE, results='show'}
+a<-forecast_product(umar_total_territory,1,3,1)
+a[[2]]
+kable(a[[1]])
+
+```
+
+#Quarterly
+``` {r echo =FALSE, results = 'asis', warning=FALSE, results='show'}
+
+a<-forecast_product(umar_total_territory,1,3,2)
+a[[2]]
+kable(a[[1]])
+```
+
+
+# Mattress Wire 
+
+``` {r echo =FALSE, results = 'asis', warning=FALSE, results='show'}
+a<-decompose_products(umar_total_territory,7,1)
+a[[1]]
+a[[2]]
+a[[3]]
+
+```
+
+#Monthly
+``` {r echo =FALSE, results = 'asis', warning=FALSE, results='show'}
+a<-forecast_product(umar_total_territory,1,7,1)
+a[[2]]
+kable(a[[1]])
+
+```
+
+#Quarterly
+``` {r echo =FALSE, results = 'asis', warning=FALSE, results='show'}
+
+a<-forecast_product(umar_total_territory,1,7,2)
+a[[2]]
+kable(a[[1]])
+```
+
+
+# HAF
+
+``` {r echo =FALSE, results = 'asis', warning=FALSE, results='show'}
+a<-decompose_products(umar_total_territory,9,1)
+a[[1]]
+a[[2]]
+a[[3]]
+
+```
+
+#Monthly
+``` {r echo =FALSE, results = 'asis', warning=FALSE, results='show'}
+a<-forecast_product(umar_total_territory,1,9,1)
+a[[2]]
+kable(a[[1]])
+
+```
+
+#Quarterly
+``` {r echo =FALSE, results = 'asis', warning=FALSE, results='show'}
+
+a<-forecast_product(umar_total_territory,1,9,2)
+a[[2]]
+kable(a[[1]])
+```
+
+
+# Tiller Wire 
+
+``` {r echo =FALSE, results = 'asis', warning=FALSE, results='show'}
+a<-decompose_products(umar_total_territory,11,1)
+a[[1]]
+a[[2]]
+a[[3]]
+
+```
+
+#Monthly
+``` {r echo =FALSE, results = 'asis', warning=FALSE, results='show'}
+a<-forecast_product(umar_total_territory,1,11,1)
+a[[2]]
+kable(a[[1]])
+
+```
+
+#Quarterly
+``` {r echo =FALSE, results = 'asis', warning=FALSE, results='show'}
+
+a<-forecast_product(umar_total_territory,1,11,2)
+a[[2]]
+kable(a[[1]])
+```
+
+# Needle Wire 
+
+``` {r echo =FALSE, results = 'asis', warning=FALSE, results='show'}
+a<-decompose_products(umar_total_territory,20,1)
+a[[1]]
+a[[2]]
+a[[3]]
+
+```
+
+#Monthly
+``` {r echo =FALSE, results = 'asis', warning=FALSE, results='show'}
+a<-forecast_product(umar_total_territory,1,20,1)
+a[[2]]
+kable(a[[1]])
+
+```
+
+#Quarterly
+``` {r echo =FALSE, results = 'asis', warning=FALSE, results='show'}
+
+a<-forecast_product(umar_total_territory,1,20,2)
+a[[2]]
+kable(a[[1]])
+```
+
+
