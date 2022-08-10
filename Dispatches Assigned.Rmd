@@ -1,0 +1,96 @@
+---
+title: "Gem Assigned"
+output: html_document
+---
+
+``` {r echo =FALSE, results = 'asis', message=FALSE, warning=FALSE, results='show'}
+
+library(fpp2)
+library(dplyr)
+library(tidyr)
+library(xts)
+library(tidyverse)
+library(knitr)
+library(dygraphs)
+library(tidyverse)
+library(dplyr)
+library(data.table)
+library(stringr)
+library(plotly)
+library(Hmisc)
+
+
+
+
+
+umar<-read_csv("~/Desktop/Gem Documents /Analytics/Dispatches assigned .csv")%>%as.data.frame()
+
+umar$`Time Scheduled`<-umar$`Time Scheduled`%>%()
+
+umar$`Customer Name`<-toupper(umar$`Customer Name`)
+umar$Day<-format(as.Date(umar$Date,format="%m/%d/%Y"), format = "%d")
+umar$Month<-format(as.Date(umar$Date,format="%m/%d/%Y"), format = "%m")
+umar$Year<-format(as.Date(umar$Date,format="%m/%d/%Y"), format = "%m")
+
+
+```
+
+# Dispatches Set By Date
+
+``` {r echo =FALSE, results = 'asis', warning=FALSE, results='show'}
+source("~/Desktop/Gem Documents /Analytics/graphs.R")
+a<-draw_pareto(umar,"Date","Total Volume")
+a[[1]]
+kable(a[[2]])
+# class(a[[2]])
+```
+
+# Dispatches Set By Day
+
+``` {r echo =FALSE, results = 'asis', warning=FALSE, results='show'}
+source("~/Desktop/Gem Documents /Analytics/graphs.R")
+a<-draw_pareto(umar,"Day","Total Volume")
+a[[1]]
+kable(a[[2]])
+# class(a[[2]])
+```
+# Dispatches Set By Month
+
+``` {r echo =FALSE, results = 'asis', warning=FALSE, results='show'}
+source("~/Desktop/Gem Documents /Analytics/graphs.R")
+a<-draw_pareto(umar,"Month","Total Volume")
+a[[1]]
+kable(a[[2]])
+# class(a[[2]])
+```
+
+
+
+# Dispatches Set By Customer 
+
+``` {r echo =FALSE, results = 'asis', warning=FALSE, results='show'}
+a<-draw_pareto(umar,"Customer Name","Total Volume")
+a[[1]]
+kable(a[[2]])
+```
+
+
+# Dispatches Set By Product 
+
+``` {r echo =FALSE, results = 'asis', warning=FALSE, results='show'}
+a<-draw_pareto(umar,"Product","Total Volume")
+a[[1]]
+kable(a[[2]])
+```
+
+# Dispatches Set By Packing Size 
+
+``` {r echo =FALSE, results = 'asis', warning=FALSE, results='show'}
+a<-draw_pareto(umar,"Packing","Total Volume")
+a[[1]]
+kable(a[[2]])
+```
+
+
+
+

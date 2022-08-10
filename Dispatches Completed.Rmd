@@ -1,0 +1,175 @@
+---
+title: "Gem Completed Despatches"
+output: html_document
+---
+
+``` {r echo =FALSE, results = 'asis', message=FALSE, warning=FALSE, results='show'}
+
+library(fpp2)
+library(dplyr)
+library(tidyr)
+library(xts)
+library(tidyverse)
+library(knitr)
+#library(dygraphs)
+library(tidyverse)
+library(dplyr)
+library(data.table)
+library(stringr)
+library(plotly)
+library(Hmisc)
+library(googlesheets4)
+
+gs_auth(new_user = TRUE)
+
+# 
+# assigned_df<-read_csv("~/Desktop/Gem Documents /Analytics/Dispatches assigned .csv")%>%as.data.frame()
+
+# assigned_df$`Time Scheduled`<-assigned_df$`Time Scheduled`%>%(
+
+assigned_df$`Customer Name`<-toupper(assigned_df$`Customer Name`)
+assigned_df$Day<-format(as.Date(assigned_df$Date,format="%m/%d/%Y"), format = "%d")
+assigned_df$Month<-format(as.Date(assigned_df$Date,format="%m/%d/%Y"), format = "%m")
+assigned_df$Year<-format(as.Date(assigned_df$Date,format="%m/%d/%Y"), format = "%m")
+
+
+umar<-read_csv("~/Desktop/Gem Documents /Analytics/Dispatches Completed.csv")%>%as.data.frame()
+
+umar$`Customer Name`<-toupper(umar$`Customer Name`)
+umar$`Transporter 1 Name`<-toupper(umar$`Transporter 1 Name`)
+
+cust_list<-umar$`Customer Name`
+
+custnames <-strsplit(umar$`Customer Name`,split = "\\( P")
+
+umar$`Customer Name`<-lapply(custnames, `[[`, 1)
+
+umar$`Date ASSND`<-(as.Date(umar$`Date ASSND`,format="%m/%d/%Y"))
+umar$`Date COMP`<-(as.Date(umar$`Date COMP`,format="%m/%d/%Y"))
+
+umar$diff_time<-difftime(umar$`Date COMP`, umar$`Date ASSND`,units = "days") 
+
+
+plot_ly(umar, labels = ~Status, values = ~`Dispatch Quantity`, type = 'pie') %>% layout(title = paste('Chart for Total Dispatches from 1/12/2020'))
+
+
+```
+
+# Dispatches  Date
+
+``` {r echo =FALSE, results = 'asis', warning=FALSE, results='show'}
+source("~/Desktop/Gem Documents /Analytics/graphs.R")
+umar$Date_Completed<-umar$`Date COMP`%>%as.Date("%m/%d/%y")
+a<-draw_groupBarChart(umar,"Date_Completed","Dispatch Quantity","Volume (OT)","Volume (Before Time)","Volume (Late)")
+a[[1]]
+setnames(a[[2]], old = c("col1", "col2", "col3", "col4","col5"), new=c("Date_Completed","Dispatch Quantity","On Time","Before Deadline","Pending from previous days"))
+
+kable(a[[2]])
+# class(a[[2]])
+```
+
+
+
+
+<!-- # Dispatches completed By Day -->
+
+<!-- ``` {r echo =FALSE, results = 'asis', warning=FALSE, results='show'} -->
+<!-- source("~/Desktop/Gem Documents /Analytics/graphs.R") -->
+<!-- a<-draw_pareto(umar,"Day","Dispatch Quantity") -->
+<!-- a[[1]] -->
+<!-- kable(a[[2]]) -->
+<!-- # class(a[[2]]) -->
+<!-- ``` -->
+<!-- # Dispatches completed By Month -->
+
+<!-- ``` {r echo =FALSE, results = 'asis', warning=FALSE, results='show'} -->
+<!-- source("~/Desktop/Gem Documents /Analytics/graphs.R") -->
+<!-- a<-draw_pareto(umar,"Month","Dispatch Quantity") -->
+<!-- a[[1]] -->
+<!-- kable(a[[2]]) -->
+<!-- # class(a[[2]]) -->
+<!-- ``` -->
+
+# Dispatches completed By Customer 
+
+``` {r echo =FALSE, results = 'asis', warning=FALSE, results='show'}
+cust_pies<-umar%>%group_by(`Customer Name`)%>%summarise(`Dispatch Quantity`=sum(`Dispatch Quantity`),`Volume (Before Time)`=sum(`Volume (Before Time)`),`Volume (OT)`=sum(`Volume (OT)`),`Volume (Late)`=sum(`Volume (Late)`),max_delay=max(diff_time),diff_time=mean(diff_time))
+
+cust_pies<-cust_pies%>%mutate(percentage_late = 100*(`Volume (Late)`/`Dispatch Quantity`),percentage_beforeTime = 100*(`Volume (Before Time)`/`Dispatch Quantity`),percentage_ontime = 100*(`Volume (OT)`/`Dispatch Quantity`))
+
+cust_pies<-cust_pies%>%arrange(desc(percentage_late)) 
+
+plot_ly(cust_pies, x = ~`Customer Name`, y = ~percentage_late, type = 'bar', name = 'Late') %>% add_trace(y = ~percentage_beforeTime, name = "Before Time" ) %>% add_trace(y = ~percentage_ontime, name = "On Time" )
+
+kable(cust_pies)
+```
+
+``` {r echo =FALSE, results = 'asis', warning=FALSE, results='show'}
+cust_pies$`Dispatch Quantity`<-(cust_pies$`Dispatch Quantity`)/1000
+
+plot_ly(cust_pies, x = ~`Customer Name`, y = ~`Dispatch Quantity`, type = 'bar', name = 'Dispatch Quantity(*1000)') %>% add_trace(y = ~diff_time, name = "Average Delay" )%>% add_trace(y = ~max_delay, name = "Maximum Delay" )
+
+
+```
+
+
+# Dispatches completed By Transporter Initial
+
+``` {r echo =FALSE, results = 'asis', warning=FALSE, results='show'}
+transporter_pies<-umar%>%group_by(`Transporter 1 Name`)%>%summarise(`Dispatch Quantity`=sum(`Dispatch Quantity`),`Volume (Before Time)`=sum(`Volume (Before Time)`),`Volume (OT)`=sum(`Volume (OT)`),`Volume (Late)`=sum(`Volume (Late)`),max_delay=max(diff_time),diff_time=mean(diff_time))
+
+transporter_pies<-transporter_pies%>%mutate(percentage_late = 100*(`Volume (Late)`/`Dispatch Quantity`),percentage_beforeTime = 100*(`Volume (Before Time)`/`Dispatch Quantity`),percentage_ontime = 100*(`Volume (OT)`/`Dispatch Quantity`))
+
+transporter_pies<-transporter_pies%>%arrange(desc(percentage_late)) 
+
+plot_ly(transporter_pies, x = ~`Transporter 1 Name`, y = ~percentage_late, type = 'bar', name = 'Late') %>% add_trace(y = ~percentage_beforeTime, name = "Before Time" ) %>% add_trace(y = ~percentage_ontime, name = "On Time" )
+
+kable(transporter_pies)
+```
+
+``` {r echo =FALSE, results = 'asis', warning=FALSE, results='show'}
+transporter_pies$`Dispatch Quantity`<-(transporter_pies$`Dispatch Quantity`)/1000
+
+plot_ly(transporter_pies, x = ~`Transporter 1 Name`, y = ~`Dispatch Quantity`, type = 'bar', name = 'Dispatch Quantity (*1000)') %>% add_trace(y = ~diff_time, name = "Average Delay" )%>% add_trace(y = ~max_delay, name = "Maximum Delay" )
+
+
+```
+
+
+<!-- # Dispatches completed 'ON TIME' By Customer  -->
+
+<!-- ``` {r echo =FALSE, results = 'asis', warning=FALSE, results='show'} -->
+<!-- starwars %>% filter(mass > mean(mass, na.rm = TRUE)) -->
+<!-- a<-draw_pareto(gem_ontime,"Customer Name","Dispatch Quantity") -->
+<!-- a[[1]] -->
+<!-- kable(a[[2]]) -->
+<!-- ``` -->
+
+<!-- # Dispatches completed 'DEADLINE MISSED' By Customer -->
+
+<!-- ``` {r echo =FALSE, results = 'asis', warning=FALSE, results='show'} -->
+<!-- source("~/Desktop/Gem Documents /Analytics/graphs.R") -->
+<!-- a<-draw_pareto(gem_late,"Customer Name","Dispatch Quantity") -->
+<!-- a[[1]] -->
+<!-- kable(a[[2]]) -->
+<!-- # class(a[[2]]) -->
+<!-- ``` -->
+
+
+# Dispatches completed By Product 
+
+``` {r echo =FALSE, results = 'asis', warning=FALSE, results='show'}
+a<-draw_pareto(umar,"Product","Dispatch Quantity")
+a[[1]]
+kable(a[[2]])
+```
+
+# Dispatches completed By Packing Size 
+
+``` {r echo =FALSE, results = 'asis', warning=FALSE, results='show'}
+a<-draw_pareto(umar,"Packing","Dispatch Quantity")
+a[[1]]
+kable(a[[2]])
+```
+
+
